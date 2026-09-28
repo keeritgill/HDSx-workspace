@@ -1,10 +1,12 @@
 ---
 title: "My First Report"
-author: "Your Name"
+author: "Keerit Gill"
 format:
   html:
     embed-resources: true
 ---
+## My Notes
+This week I learned how to edit and render a **Quarto** document. I also learned the difference between **committing** and **syncing**. I used Claude to help me understand Quarto syntax and fix a preview error, then I verified the results by rendering the report and checking the HTML output myself.
 
 ## Welcome to your practice report
 
@@ -25,6 +27,12 @@ patients <- read.csv("data/patients.csv")
 head(patients)
 ```
 
+```{r}
+mean_age <- mean(patients$age)
+```
+
+The average age of the patients is `r round(mean_age, 1)` years.
+
 ## A first chart
 
 ```{r}
@@ -36,8 +44,8 @@ hist(patients$age,
 
 ## Your turn
 
-- Add a sentence here describing what you notice in the chart.
-- Render again and check that both your sentence and the chart appear.
+- Most of the patients are within the ages of 40 and 70 (9) and only 3 patients fall outside this range.
 
 When you are happy with the result, **commit and sync** your work (the Week 2
 course page walks you through this), then submit your repository link on Canvas.
+
