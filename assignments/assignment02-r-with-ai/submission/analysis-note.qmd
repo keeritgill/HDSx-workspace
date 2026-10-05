@@ -1,0 +1,106 @@
+---
+title: "Assignment 2 Analysis: Mean BMI by Race in NHANES"
+author: "Keerit Gill"
+format: html
+---
+
+## Setup
+
+```{r}
+#| message: false
+#| warning: false
+library(tidyverse)  # AI-EDIT(2026-06-23): tidyverse-default — consolidated core library() calls into library(tidyverse)
+```
+
+## Load Data
+
+```{r}
+nhanes <- read_csv("examples/nhanes-equity/data/nhanes_equity_v6.csv", show_col_types = FALSE)
+```
+
+
+## Inspect
+
+```{r}
+dim(nhanes)
+names(nhanes)
+glimpse(nhanes)
+colSums(is.na(nhanes))
+```
+
+### Missing values in the analysis variables
+```{r}
+
+# AI Prompt (Claude): I asked whether na.rm = TRUE in mean_with_n() 
+#   was enough to handle missing values. Claude said yes (handles
+#   missing BMI values) but suggested adding missing row summary to
+#   see how many rows were excluded.
+# Verified: Subtracted missing BMI rows from total rows and got 
+#   same result as mean_with_n(nhanes$BMI); there were no missing
+#   race values
+nhanes |>
+  summarize(
+    total_rows = n(),
+    missing_bmi = sum(is.na(BMI)),
+    missing_race = sum(is.na(Race))
+  )
+
+```
+
+#### The summary excludes 9356 (~8.9%) of all rows. These are all due to missing BMI values. No entries are missing a race value. 96270 rows were used for the BMI-by-race summary.
+
+## Function
+
+```{r}
+mean_with_n <- function(x) {
+  tibble(
+    n = sum(!is.na(x)),
+    mean = mean(x, na.rm = TRUE)
+  )
+}
+```
+
+## Summarize
+
+```{r}
+mean_with_n(nhanes$BMI)
+
+# AI prompt (Claude): asked how to use mean_with_n() function inside the 
+#   pipeline. Claude suggested calling it within summarise() - used below.
+# Verified: checked what each line of code was passed and the output,
+#   especially following through mean_with_n() argument in summarise().
+# AI Prompt (Claude): I asked whether na.rm = TRUE in mean_with_n() 
+#   was enough to handle missing values and replace filtering
+#   step in pipe. Claude said it was for BMI, but not for Race, but to 
+#   keep both filtering steps to be explicit about data filtering. 
+# Verified: missing values chunk showed no missing Race values but many 
+#   missing BMI values; kept filter in pipe to ensure data filtering
+#   was explicit.
+bmi_by_race <- nhanes |>
+    filter(!is.na(BMI), !is.na(Race)) |>
+    group_by(Race) |>
+    summarise(mean_with_n(BMI)
+    )
+bmi_by_race
+
+```
+
+#### The mean BMI across the race groups ranges from 23.7 to 26.1.
+
+## Save Output
+
+```{r}
+dir.create("assignments/assignment02-r-with-ai/submission/output", recursive = TRUE, showWarnings = FALSE)
+write_csv(bmi_by_race, "assignments/assignment02-r-with-ai/submission/output/summary_table.csv")
+```
+
+## AI Audit Note
+
+AI (Claude) used for: 
+
+- explain starter code, step by step 
+- debug the summary pipeline
+- suggested calling mean_with_n() inside summarise()
+- suggested missing values summary
+
+*Asked Github Copilot Chat about how to write a function for average BMI by race but did not use its suggestion
