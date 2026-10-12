@@ -2,7 +2,14 @@
 
 These are student-facing starters and templates, not solutions. Keep each
 original starter unchanged and place your edited work in that assignment's
-`submission/` folder using the filename in the course brief.
+`submission/` folder using the filename in the course brief. 
+
+Instead of editing starter file, copy the starter file into your desired folder and edit it there. Do this:
+
+```bash
+cp <path-to-starter-file> <path-to-folder>
+```
+
 
 | Assignment | Starter or template |
 |---|---|
