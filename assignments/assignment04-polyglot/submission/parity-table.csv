@@ -1,0 +1,17 @@
+metric,r_value,python_value,match,notes
+raw_row_count,105626,105626,yes,same number of rows
+raw_column_count,18,18,yes,Both have same number of variables
+filtered_row_count,87647,87647,yes,Both dropped same missing rows
+number_of_groups,18,18,yes,Both have same amount and named groups
+mean_bmi High Income Female, 25.74, 25.74, yes, same mean
+mean_bmi High Income Male, 26.11, 26.11, yes, same mean
+mean_bmi Low Income Female, 25.95, 25.95, yes, same mean
+mean_bmi Low Income Male, 24.05, 24.05, yes, same mean
+mean_bmi Middle Income Female, 26.39, 26.39, yes, same mean
+mean_bmi Middle Income Male, 25.52, 25.52, yes, same mean
+sd_bmi High Income Female, 7.51, 7.51, yes, same sd
+sd_bmi High Income Male, 6.81, 6.81, yes, same sd
+sd_bmi Low Income Female, 8.65, 8.65, yes, same sd
+sd_bmi Low Income Male, 7.17, 7.17, yes, same sd
+sd_bmi Middle Income Female, 8.20, 8.20, yes, same sd
+sd_bmi Middle Income Male, 7.22, 7.22, yes, same sd

@@ -1,5 +1,5 @@
 ---
-title: Assignment 4: Polyglot Parity - R function & pipeline
+title: "Assignment 4: Polyglot Parity - R function & pipeline"
 format: html
 ---
 
@@ -10,6 +10,15 @@ library(tidyverse)
 
 nhanes <- read_csv("examples/nhanes-equity/data/nhanes_equity_v6.csv")
 ```
+
+## Data Inspection
+```{r}
+nrow(nhanes)
+ncol(nhanes)
+names(nhanes)
+sum(is.na(nhanes$BMI))
+```
+
 
 ## BMI summary by IncomeGroup and Gender
 ```{r}
@@ -47,3 +56,24 @@ r_function_summary <- summarise_mean_sd(nhanes, BMI, IncomeGroup, Gender)
 r_function_summary
 nrow(r_function_summary)
 ```
+
+## Parity Discussion
+
+Rows with complete data for BMI, IncomeGroup, and Gender
+```{r}
+nrow(filter(nhanes, !is.na(BMI), !is.na(IncomeGroup), !is.na(Gender)))
+```
+
+After removing rows with missing BMI, IncomeGroup, or Gender, both R and Python keep 87647 rows, so the missingness filter matches. 
+
+```{r}
+r_summary$mean_bmi
+r_summary$sd_bmi
+```
+I compared my R summary with the Python translation in translation.ipynb. The raw row count, column count, filtered row count (after removing rows missing BMI, IncomeGroup, or Gender), number of groups, group labels, and rounded mean and SD of BMI all matched for each group. 
+The R tibble displaying the mean and sd printed fewer digits than the python, so I ran r_summary$mean_bmi and r_summary$sd_bmi to find that the stored values matched and it was just a difference in displayed digits. The Python translation matched the R function and thus were in parity.
+
+## Rendered output instructions
+
+Run the following in the terminal:
+quarto render assignments/assignment04-polyglot/submission/polyglot-parity.qmd
