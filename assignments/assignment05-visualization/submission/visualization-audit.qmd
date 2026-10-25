@@ -1,5 +1,5 @@
----
-Visualization Audit
+
+# Visualization Audit
 
 ```{r}
 
@@ -17,46 +17,92 @@ if (is.na(data_path)) {
 
 nhanes <- read_csv(data_path, show_col_types = FALSE)
 
-cycle_levels <- sort(unique(nhanes$Cycle))
-endpoint_cycles <- c(cycle_levels[1], cycle_levels[length(cycle_levels)])
+glimpse(nhanes)
+```
 
-flawed_summary <- nhanes |>
-  filter(!is.na(BMI), !is.na(IncomeGroup), Cycle %in% endpoint_cycles) |>
-  group_by(Cycle, IncomeGroup) |>
-  summarise(
-    mean_bmi = mean(BMI),
-    .groups = "drop"
-  )
+### Summary of BMI by Income Group per Cycle
+```{r}
 
-flawed_plot <- ggplot(
-  flawed_summary,
+# Filter out rows with missing values in any of BMI, IncomeGroup, and Cycle.
+# Only include rows with ages in range [20,80].
+# Only include data from income groups in each cycle that have 30 or more rows. 
+
+bmi_by_income_by_cycle <- nhanes |>
+  filter(
+    !is.na(BMI),
+    !is.na(IncomeGroup),
+    !is.na(Cycle),
+    Age >= 20,
+    Age <= 80
+    ) |>
+    group_by(Cycle, IncomeGroup) |>
+    summarize(
+      n = n(),
+      mean_bmi = mean(BMI),
+      .groups = "drop"
+    ) |> 
+    filter(n >= 30)
+
+bmi_by_income_by_cycle
+```
+
+### Plot of BMI by Income Group per Cycle
+```{r}
+
+bmi_plot <- ggplot(
+  bmi_by_income_by_cycle,
   aes(x = Cycle, y = mean_bmi, color = IncomeGroup, group = IncomeGroup)
 ) +
   geom_point(size = 3) +
-  geom_line(linetype = "dashed", linewidth = 1) +
-  scale_y_continuous(limits = c(24, 28)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_brewer(palette = "Dark2") +
+  expand_limits(y = 0) +
   labs(
-    title = "Low income drives rising obesity in American adults",
-    subtitle = "Adults age 20-80: BMI climbed steadily across every NHANES cycle",
+    title = "Mean BMI by Income Group across NHANES cycles",
+    subtitle = "Adults age 20-80 in prepared classroom dataset",
     x = "NHANES cycle",
-    y = "BMI",
-    color = "Income"
+    y = "Mean BMI",
+    color = "Income Group",
+    caption = "This figure shows BMI by Income Group across NHANES cycles using the prepared NHANES \nHealth Equity classroom dataset. The summary is descriptive and unweighted. Records with missing \nBMI, Income Group, or Cycle and groups with less than 30 records were excluded. \nThe plot supports comparison of patterns, not causal claims or population-level estimates."
   ) +
-  theme_minimal(base_size = 12)
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
 
-print(flawed_plot)
+bmi_plot
+```
 
-# AI-EDIT(2026-06-11): MIT-067 — needs review
-# Not a planted flaw: this save step guarantees you can see the figure even if
-# no plot viewer pane opens. The PNG is written to your current working folder
-# (run getwd() to see where). Find flawed-plot.png in the Explorer, right-click
-# it, and choose Open Preview.
-ggsave("flawed-plot.png", flawed_plot, width = 7, height = 5)
-
+### Save Plot
+```{r}
+ggsave(
+  "assignments/assignment05-visualization/submission/corrected-plot.png",
+  plot = bmi_plot,
+  width = 7,
+  height = 5
+)
 ```
 
 
+### Revisions:
 
-##Revisions:
+###### flawed_summary details:
+  - used helpers, cycle_levels to pull out and sort unique values of Cycle & endpoint_cycles to get only the first and last cycles in the chronological order list
+  - the filter pipeline only included rows with the non-missing values of BMI and IncomeGroup from the endpoint_cycles with no age filtering or minimum row count filtering
+  - loaded packages separately instead of using tidyverse
+  - loaded csv via three different paths, only one of which would work on any computer
+  - used dashed lines for the line type in the plot
+
+###### Changes
+- only loaded tidyverse
+- changed candidate_paths to load csv via a single relative path that will work on any computer
+- glimpse(nhanes) to check the data structure
+- cleaned up summary of BMI by Income Group per Cycle using a pipeline that is easy to folllow; now includes all rows with non-missing BMI, IncomeGroup, and Cycle values, ages between 20 and 80, and only income groups with 30 or more rows per cycle 
+Changes to plot of BMI by Income Group per Cycle:
+ - uses the new summary that more accurately reflects the title as mentioned above
+ - includes a caption that explains the limitations of the analysis
+ - line type is solid 
+ - began the y-axis at 0 to avoid misleading visualizations
 
 
